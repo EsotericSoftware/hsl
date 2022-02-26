@@ -1,0 +1,82 @@
+/* Copyright (c) 2022 Nathan Sweet
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package com.esotericsoftware.hsluv;
+
+import static com.esotericsoftware.hsluv.Hsl.*;
+
+/** Stores an RGB color. Interpolation is done without losing brightness.
+ * @author Nathan Sweet */
+public class Rgb {
+	public float r, g, b;
+
+	public Rgb () {
+	}
+
+	public Rgb (Rgb rgb) {
+		setRgb(rgb);
+	}
+
+	public Rgb (float r, float g, float b) {
+		setRgb(r, g, b);
+	}
+
+	public Rgb setRgb (Rgb rgb) {
+		this.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+		this.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+		this.b = b < 0 ? 0 : (b > 1 ? 1 : b);
+		return this;
+	}
+
+	public Rgb setRgb (float r, float g, float b) {
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		return this;
+	}
+
+	public Rgb setRgb (int rgb) {
+		r = ((rgb & 0xff0000) >>> 16) / 255f;
+		g = ((rgb & 0x00ff00) >>> 8) / 255f;
+		b = ((rgb & 0x0000ff)) / 255f;
+		return this;
+	}
+
+	public Rgb lerp (Rgb target, float a) {
+		float r = toLinear(this.r), g = toLinear(this.g), b = toLinear(this.b);
+		float r2 = toLinear(target.r), g2 = toLinear(target.g), b2 = toLinear(target.b);
+		float L = rgbToL(r, g, b);
+		L += (rgbToL(r2, g2, b2) - L) * a;
+		r += (r2 - r) * a;
+		g += (g2 - g) * a;
+		b += (b2 - b) * a;
+		L /= rgbToL(r, g, b); // Scale RGB to the interpolated lightness.
+		this.r = fromLinear(r * L);
+		this.g = fromLinear(g * L);
+		this.b = fromLinear(b * L);
+		return this;
+	}
+
+	static private float rgbToL (float r, float g, float b) {
+		float Y = minv[1][0] * r + minv[1][1] * g + minv[1][2] * b;
+		return Y <= epsilon ? Y * kappa : 1.16f * (float)Math.pow(Y, 1 / 3f) - 0.16f;
+	}
+}

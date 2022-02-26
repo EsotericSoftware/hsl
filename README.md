@@ -11,4 +11,6 @@ Simple interpolation of HSL mixes around the hue circle clockwise or countercloc
 
 Simple interpolation of RGB doesn't have those problems but results in a darker color in the middle of the mix. This can be improved by interpolating on linear rather than gamma corrected values but that worsens some mixes, such black to white. Mark Ransom provides a [potential solution](https://stackoverflow.com/a/49321304/187883), but it crushes the start and end of the black to white gradient.
 
-This library interpolates between two HSLuv colors by converting to linear RGB, interpolating, then converting back to HSLuv. The lightness of the start and end HSLuv colors are also interpolated and used to correct the lightness of the interpolated RGB value.
+This library interpolates between two HSLuv colors by converting to linear RGB, interpolating, then converting back to HSLuv. The lightness of the start and end HSLuv colors are  interpolated and used as the lightness of the interpolated color.
+
+This library interpolates between two RGB colors by interpolating linear RGB. Additionally, the lightness of the start and end RGB colors are computed, interpolated, and used to correct the lightness of the interpolated color. The gives good RGB interpolation without requiring the full conversion to and from HSLuv.

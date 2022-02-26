@@ -34,12 +34,12 @@ public class Hsl {
 		new float[] {3.240969941904521f, -1.537383177570093f, -0.498610760293f},
 		new float[] {-0.96924363628087f, 1.87596750150772f, 0.041555057407175f},
 		new float[] {0.055630079696993f, -0.20397695888897f, 1.056971514242878f}};
-	static private final float[][] minv = new float[][] { //
+	static final float[][] minv = new float[][] { //
 		new float[] {0.41239079926595f, 0.35758433938387f, 0.18048078840183f},
 		new float[] {0.21263900587151f, 0.71516867876775f, 0.072192315360733f},
 		new float[] {0.019330818715591f, 0.11919477979462f, 0.95053215224966f}};
 	static private final float refU = 0.19783000664283f, refV = 0.46831999493879f;
-	static private final float kappa = 9.032962962f, epsilon = 0.0088564516f;
+	static final float kappa = 9.032962962f, epsilon = 0.0088564516f;
 	static private final float radDeg = (float)(180f / Math.PI);
 	static private final float degRad = (float)(Math.PI / 180);
 
@@ -72,7 +72,7 @@ public class Hsl {
 	}
 
 	public Hsl setRgb (Rgb rgb) {
-		setRgb(rgb.r, rgb.g, rgb.b);
+		setRgb(rgb.r, rgb.g, rgb.b, false);
 		return this;
 	}
 
@@ -85,7 +85,8 @@ public class Hsl {
 		float r = ((rgb & 0xff0000) >>> 16) / 255f;
 		float g = ((rgb & 0x00ff00) >>> 8) / 255f;
 		float b = ((rgb & 0x0000ff)) / 255f;
-		return setRgb(r, g, b);
+		setRgb(r, g, b, false);
+		return this;
 	}
 
 	private Hsl setRgb (float r, float g, float b, boolean keepL) {
@@ -188,8 +189,12 @@ public class Hsl {
 
 	public Hsl lerp (Hsl target, float a) {
 		l += (target.l - l) * a;
-		Rgb linear = getRgbLinear(rgb).lerp(target.getRgbLinear(target.rgb), a);
-		setRgb(fromLinear(linear.r), fromLinear(linear.g), fromLinear(linear.b), true);
+		Rgb rgb = getRgbLinear(this.rgb);
+		Rgb rgb2 = target.getRgbLinear(target.rgb);
+		rgb.r += (rgb2.r - rgb.r) * a;
+		rgb.g += (rgb2.g - rgb.g) * a;
+		rgb.b += (rgb2.b - rgb.b) * a;
+		setRgb(fromLinear(rgb.r), fromLinear(rgb.g), fromLinear(rgb.b), true);
 		return this;
 	}
 
@@ -235,26 +240,15 @@ public class Hsl {
 		return line2 / (sin - line1 * cos);
 	}
 
-	static private float fromLinear (float value) {
+	static float fromLinear (float value) {
 		return value <= 0.0031308f ? value * 12.92f : (float)(Math.pow(value, 1 / 2.4f) * 1.055f - 0.055f);
 	}
 
-	static private float toLinear (float value) {
+	static float toLinear (float value) {
 		return value <= 0.04045f ? value / 12.92f : (float)Math.pow((value + 0.055f) / 1.055f, 2.4f);
 	}
 
 	static private float dot (float[] a, float b0, float b1, float b2) {
 		return a[0] * b0 + a[1] * b1 + a[2] * b2;
-	}
-
-	static public class Rgb {
-		public float r, g, b;
-
-		public Rgb lerp (Rgb target, float a) {
-			r += (target.r - r) * a;
-			g += (target.g - g) * a;
-			b += (target.b - b) * a;
-			return this;
-		}
 	}
 }
