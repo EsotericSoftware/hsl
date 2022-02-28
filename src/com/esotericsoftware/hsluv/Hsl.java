@@ -50,21 +50,21 @@ public class Hsl {
 	}
 
 	public Hsl (Hsl hsl) {
-		setHsl(hsl);
+		set(hsl);
 	}
 
 	public Hsl (float h, float s, float l) {
-		setHsl(h, s, l);
+		set(h, s, l);
 	}
 
-	public Hsl setHsl (Hsl hsl) {
+	public Hsl set (Hsl hsl) {
 		h = hsl.h;
 		s = hsl.s;
 		l = hsl.l;
 		return this;
 	}
 
-	public Hsl setHsl (float h, float s, float l) {
+	public Hsl set (float h, float s, float l) {
 		this.h = h < 0 ? 0 : (h > 360 ? 360 : h);
 		this.s = s < 0 ? 0 : (s > 1 ? 1 : s);
 		this.l = l < 0 ? 0 : (l > 1 ? 1 : l);
@@ -188,6 +188,8 @@ public class Hsl {
 	}
 
 	public Hsl lerp (Hsl target, float a) {
+		if (a == 0) return this;
+		if (a == 1) return set(target);
 		l += (target.l - l) * a;
 		Rgb rgb = getRgbLinear(this.rgb);
 		Rgb rgb2 = target.getRgbLinear(target.rgb);

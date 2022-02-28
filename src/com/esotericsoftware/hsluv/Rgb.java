@@ -32,28 +32,28 @@ public class Rgb {
 	}
 
 	public Rgb (Rgb rgb) {
-		setRgb(rgb);
+		set(rgb);
 	}
 
 	public Rgb (float r, float g, float b) {
-		setRgb(r, g, b);
+		set(r, g, b);
 	}
 
-	public Rgb setRgb (Rgb rgb) {
+	public Rgb set (Rgb rgb) {
 		this.r = r < 0 ? 0 : (r > 1 ? 1 : r);
 		this.g = g < 0 ? 0 : (g > 1 ? 1 : g);
 		this.b = b < 0 ? 0 : (b > 1 ? 1 : b);
 		return this;
 	}
 
-	public Rgb setRgb (float r, float g, float b) {
+	public Rgb set (float r, float g, float b) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
 		return this;
 	}
 
-	public Rgb setRgb (int rgb) {
+	public Rgb set (int rgb) {
 		r = ((rgb & 0xff0000) >>> 16) / 255f;
 		g = ((rgb & 0x00ff00) >>> 8) / 255f;
 		b = ((rgb & 0x0000ff)) / 255f;
@@ -61,6 +61,8 @@ public class Rgb {
 	}
 
 	public Rgb lerp (Rgb target, float a) {
+		if (a == 0) return this;
+		if (a == 1) return set(target);
 		float r = toLinear(this.r), g = toLinear(this.g), b = toLinear(this.b);
 		float r2 = toLinear(target.r), g2 = toLinear(target.g), b2 = toLinear(target.b);
 		float L = rgbToL(r, g, b);
@@ -68,11 +70,37 @@ public class Rgb {
 		r += (r2 - r) * a;
 		g += (g2 - g) * a;
 		b += (b2 - b) * a;
-		L /= rgbToL(r, g, b); // Scale RGB to the interpolated lightness.
-		this.r = fromLinear(r * L);
-		this.g = fromLinear(g * L);
-		this.b = fromLinear(b * L);
+		float L2 = rgbToL(r, g, b);
+		float scale = L2 < 0.00001f ? 1 : L / L2;
+		this.r = fromLinear(r * scale);
+		this.g = fromLinear(g * scale);
+		this.b = fromLinear(b * scale);
 		return this;
+	}
+
+	public int toInt () {
+		return ((int)(255 * r) << 16) | ((int)(255 * g) << 8) | ((int)(255 * b));
+	}
+
+	public boolean equals (Object o) {
+		if (o == null) return false;
+		Rgb other = (Rgb)o;
+		return (int)(255 * r) == (int)(255 * other.r) //
+			&& (int)(255 * g) == (int)(255 * other.g) //
+			&& (int)(255 * b) == (int)(255 * other.b);
+	}
+
+	public int hashCode () {
+		int result = (int)(255 * r);
+		result = 31 * result + (int)(255 * g);
+		return 31 * result + (int)(255 * b);
+	}
+
+	public String toString () {
+		String value = Integer.toHexString(toInt());
+		while (value.length() < 6)
+			value = "0" + value;
+		return value;
 	}
 
 	static private float rgbToL (float r, float g, float b) {
