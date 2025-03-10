@@ -14,3 +14,9 @@ Simple interpolation of RGB doesn't have those problems but results in a darker 
 This library interpolates between two HSLuv colors by converting to linear RGB, interpolating, then converting back to HSLuv. The lightness of the start and end HSLuv colors are  interpolated and used as the lightness of the interpolated color.
 
 This library interpolates between two RGB colors by interpolating linear RGB. Additionally, the lightness of the start and end RGB colors are computed, interpolated, and used to correct the lightness of the interpolated color. The gives good RGB interpolation without requiring the full conversion to and from HSLuv.
+
+RGB:
+![](https://github.com/EsotericSoftware/hsl/images/RGB.png)
+
+RGB with L fix:
+![](https://github.com/EsotericSoftware/hsl/images/RGB-with-L-fix.png)
