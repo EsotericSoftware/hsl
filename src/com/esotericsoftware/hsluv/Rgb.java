@@ -40,9 +40,9 @@ public class Rgb {
 	}
 
 	public Rgb set (Rgb rgb) {
-		this.r = r < 0 ? 0 : (r > 1 ? 1 : r);
-		this.g = g < 0 ? 0 : (g > 1 ? 1 : g);
-		this.b = b < 0 ? 0 : (b > 1 ? 1 : b);
+		this.r = rgb.r;
+		this.g = rgb.g;
+		this.b = rgb.b;
 		return this;
 	}
 
