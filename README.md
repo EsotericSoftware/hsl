@@ -1,5 +1,10 @@
+# This project is now obsolete, replaced by [EsotericSoftware/colors](https://github.com/EsotericSoftware/colors).
 
-## HSL
+---
+
+---
+
+---
 
 This Java library provides a class to store a color in the HSLuv color space, interpolate between colors, and to convert between HSLuv and RGB.
 
